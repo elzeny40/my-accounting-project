@@ -1,0 +1,604 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load treasury_filters %}
+
+{% block title %}إضافة حركة خزينة{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">{% if object %}تعديل حركة خزينة{% else %}إضافة حركة خزينة جديدة{% endif %}</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="treasuryForm">
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% csrf_token %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="row">
+                    <!-- Movement ID (read-only) -->
+                    {% if object %}
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">رقم الحركة</label>
+                        <input type="text" class="form-control" value="{{ object.movement_id }}" readonly>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Account Type (Source) -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_source" class="form-label">{{ form.source.label }}</label>
+                        {{ form.source|add_class:"form-control" }}
+                    </div>
+                    
+                    <!-- Date -->
+                    <div class="col-md-4 mb-3">
+                        <label for="id_date" class="form-label">{{ form.date.label }}</label>
+                        {{ form.date|add_class:"form-control datepicker"|attr:"value:''" }}
+                    </div>
+                </div>
+                
+                <!-- Transaction Type Section -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="id_transaction_type" class="form-label">{{ form.transaction_type.label }}</label>
+                        {{ form.transaction_type|add_class:"form-control" }}
+                    </div>
+                </div>
+                
+                <!-- Record Selection Section -->
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">رقم واسم الحركة</label>
+                        <input type="hidden" name="record_id" id="record_id">
+                        <div id="depositSourceSection" style="display: none;" class="mb-3">
+                            <label class="form-label">المصدر</label>
+                            <select id="depositSource" class="form-control">
+                                <option value="client">العميل</option>
+                                <option value="company">الشركة</option>
+                                <option value="driver">السائقين</option>
+                            </select>
+                        </div>
+                        <div id="recordSelectionArea" class="border p-3 rounded">
+                            <div id="clientAccountSection" style="display: none;">
+                                <h5>اختر عملية بيع</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="salesTable">
+                                        <thead>
+                                            <tr>
+                                                <th>رقم العملية</th>
+                                                <th>العميل</th>
+                                                <th>التاريخ</th>
+                                                <th>نوع الزيت</th>
+                                                <th>الكمية</th>
+                                                <th>السعر</th>
+                                                <th>الإجمالي</th>
+                                                <th>اختيار</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated via AJAX -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div id="companyAccountSection" style="display: none;">
+                                <h5>اختر عملية شراء</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="purchasesTable">
+                                        <thead>
+                                            <tr>
+                                                <th>رقم العملية</th>
+                                                <th>المورد</th>
+                                                <th>التاريخ</th>
+                                                <th>نوع الزيت</th>
+                                                <th>الكمية</th>
+                                                <th>السعر</th>
+                                                <th>الإجمالي</th>
+                                                <th>اختيار</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated via AJAX -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div id="driverAccountSection" style="display: none;">
+                                <h5>اختر سائق</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="driversTable">
+                                        <thead>
+                                            <tr>
+                                                <th>رقم السائق</th>
+                                                <th>اسم السائق</th>
+                                                <th>رقم السيارة</th>
+                                                <th>اختيار</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated via AJAX -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transaction Details Section -->
+                <div id="transactionDetailsSection" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">نوع الزيت</label>
+                            <input type="text" class="form-control" id="oil_type_display" readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">الكمية بالطن</label>
+                            <input type="text" class="form-control" id="quantity_display" readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">سعر الطن</label>
+                            <input type="text" class="form-control" id="price_display" readonly>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">إجمالي المبلغ</label>
+                            <input type="text" class="form-control" id="total_display" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Details -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_paid_amount" class="form-label">{{ form.paid_amount.label }}</label>
+                        {{ form.paid_amount|add_class:"form-control" }}
+                        {% if form.paid_amount.errors %}
+                        <div class="text-danger">
+                            {{ form.paid_amount.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_payment_method" class="form-label">{{ form.payment_method.label }}</label>
+                        {{ form.payment_method|add_class:"form-control" }}
+                    </div>
+                </div>
+                
+                <!-- Other Payment Method (conditional) -->
+                <div class="row" id="otherPaymentMethodRow" style="display: none;">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_other_payment_method" class="form-label">طريقة الدفع الأخرى</label>
+                        {{ form.other_payment_method|add_class:"form-control" }}
+                        {% if form.other_payment_method.errors %}
+                        <div class="text-danger">
+                            {{ form.other_payment_method.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="id_description" class="form-label">{{ form.description.label }}</label>
+                        {{ form.description|add_class:"form-control"|attr:"style:height:38px;resize:none" }}
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">حفظ</button>
+                        <a href="{% url 'treasury_list' %}" class="btn btn-secondary">إلغاء</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include jQuery UI for datepicker -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize datepicker for date field
+        $('.datepicker').datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: 'c-10:c+10',
+            firstDay: 6,
+            isRTL: true,
+            autoClose: true,
+            todayButton: new Date(),
+            toggleSelected: false
+        });
+        
+        // Handle movement source change
+        $('#id_source').on('change', function() {
+            const source = $(this).val();
+            
+            // Hide all sections first
+            $('#clientAccountSection, #companyAccountSection, #driverAccountSection').hide();
+            $('#transactionDetailsSection').hide();
+            $('#record_id').val('');
+            
+            // Show the appropriate section based on selection
+            if (source === 'client') {
+                $('#clientAccountSection').show();
+                loadClientsData();
+            } else if (source === 'company') {
+                $('#clientAccountSection').show();
+                loadClientsData();
+            } else if (source === 'driver') {
+                $('#driverAccountSection').show();
+                loadDriversData();
+            }
+        });
+        
+        
+        // Handle payment method change
+        $('#id_payment_method').change(function() {
+            if ($(this).val() === 'other') {
+                $('#otherPaymentMethodRow').show();
+            } else {
+                $('#otherPaymentMethodRow').hide();
+            }
+        });
+        
+        // Load sales data via AJAX
+        function loadSalesData() {
+            $.ajax({
+                url: '{% url "api_sales" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const salesTable = $('#salesTable tbody');
+                    salesTable.empty();
+                    
+                    data.sales.forEach(function(sale) {
+                        const row = `
+                            <tr>
+                                <td>${sale.sale_id}</td>
+                                <td>${sale.client_name}</td>
+                                <td>${sale.date}</td>
+                                <td>${sale.oil_type}</td>
+                                <td>${sale.quantity}</td>
+                                <td>${sale.price}</td>
+                                <td>${sale.total}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary select-record" 
+                                            data-id="${sale.id}"
+                                            data-oil-type="${sale.oil_type}"
+                                            data-quantity="${sale.quantity}"
+                                            data-price="${sale.price}"
+                                            data-total="${sale.total}">
+                                        اختيار
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        salesTable.append(row);
+                    });
+                    
+                    // Handle sale selection
+                    $('.select-record').click(function() {
+                        const id = $(this).data('id');
+                        const oilType = $(this).data('oil-type');
+                        const quantity = $(this).data('quantity');
+                        const price = $(this).data('price');
+                        const total = $(this).data('total');
+                        
+                        $('#record_id').val(id);
+                        $('#oil_type_display').val(oilType);
+                        $('#quantity_display').val(quantity);
+                        $('#price_display').val(price);
+                        $('#total_display').val(total);
+                        
+                        $('#transactionDetailsSection').show();
+                        // Do not reset the form when selecting a record
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading sales data:', error);
+                }
+            });
+        }
+
+        // Update loadClientsData function
+        function loadClientsData() {
+            $.ajax({
+                url: '{% url "api_clients" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const salesTable = $('#salesTable');
+                    
+                    // Update table header for clients
+                    salesTable.find('thead').html(`
+                        <tr>
+                            <th>رقم العميل</th>
+                            <th>اسم العميل</th>
+                            <th>الرصيد</th>
+                            <th>اختيار</th>
+                        </tr>
+                    `);
+                    
+                    // Clear and populate table body
+                    const tbody = salesTable.find('tbody');
+                    tbody.empty();
+                    
+                    data.clients.forEach(function(client) {
+                        const row = `
+                            <tr>
+                                <td>${client.id || ''}</td>
+                                <td>${client.name}</td>
+                                <td>${client.balance}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info select-record" 
+                                            data-id="${client.id}"
+                                            data-balance="${client.balance}">
+                                        اختيار
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                    
+                    // Handle client selection
+                    $('.select-record').click(function() {
+                        const id = $(this).data('id');
+                        const balance = $(this).data('balance');
+                        $('#record_id').val(id);
+                        
+                        // Show transaction details
+                        $('#oil_type_display').val('');
+                        $('#quantity_display').val('');
+                        $('#price_display').val('');
+                        $('#total_display').val(balance);
+                        
+                        $('#transactionDetailsSection').show();
+                        
+                        // Show success message
+                        $('#recordSelectionArea').append(`
+                            <div class="alert alert-success mt-3">
+                                تم اختيار العميل بنجاح
+                                <button type="button" class="btn btn-sm btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `);
+                        
+                        setTimeout(() => {
+                            $('.alert-success').fadeOut(500, function() {
+                                $(this).remove();
+                            });
+                        }, 3000);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading clients data:', error);
+                    $('#recordSelectionArea').append(`
+                        <div class="alert alert-danger mt-3">
+                            خطأ في تحميل بيانات العملاء: ${error}
+                            <button type="button" class="btn btn-sm btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                    setTimeout(() => {
+                        $('.alert-danger').fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                },
+            });
+        }
+
+        function loadDriversData() {
+            $.ajax({
+                url: '{% url "api_drivers" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const driversTable = $('#driversTable');
+                    
+                    // Update table header for drivers
+                    driversTable.find('thead').html(`
+                        <tr>
+                            <th>رقم السائق</th>
+                            <th>اسم السائق</th>
+                            <th>رقم السيارة</th>
+                            <th>اختيار</th>
+                        </tr>
+                    `);
+                    
+                    // Clear and populate table body
+                    const tbody = driversTable.find('tbody');
+                    tbody.empty();
+                    
+                    data.drivers.forEach(function(driver) {
+                        const row = `
+                            <tr>
+                                <td>${driver.driver_id || ''}</td>
+                                <td>${driver.name}</td>
+                                <td>${driver.vehicle_number || ''}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning select-record" 
+                                            data-id="${driver.id}">
+                                        اختيار
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                    
+                    // Handle driver selection
+                    $('.select-record').click(function() {
+                        const id = $(this).data('id');
+                        $('#record_id').val(id);
+                        
+                        // Show success message
+                        $('#recordSelectionArea').append(`
+                            <div class="alert alert-success mt-3">
+                                تم اختيار السائق بنجاح
+                                <button type="button" class="btn btn-sm btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `);
+                        
+                        setTimeout(() => {
+                            $('.alert-success').fadeOut(500, function() {
+                                $(this).remove();
+                            });
+                        }, 3000);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading drivers data:', error);
+                    $('#recordSelectionArea').append(`
+                        <div class="alert alert-danger mt-3">
+                            خطأ في تحميل بيانات السائقين: ${error}
+                            <button type="button" class="btn btn-sm btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                    setTimeout(() => {
+                        $('.alert-danger').fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                },
+            });
+        }
+        
+        // Load company clients data via AJAX
+        function loadPurchasesData() {
+            $.ajax({
+                url: '{% url "api_purchases" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const purchasesTable = $('#purchasesTable tbody');
+                    purchasesTable.empty();
+                    
+                    data.purchases.forEach(function(purchase) {
+                        const row = `
+                            <tr>
+                                <td>${purchase.purchase_id}</td>
+                                <td>${purchase.supplier_name}</td>
+                                <td>${purchase.date}</td>
+                                <td>${purchase.oil_type}</td>
+                                <td>${purchase.quantity}</td>
+                                <td>${purchase.price}</td>
+                                <td>${purchase.total}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary select-record" 
+                                            data-id="${purchase.id}"
+                                            data-oil-type="${purchase.oil_type}"
+                                            data-quantity="${purchase.quantity}"
+                                            data-price="${purchase.price}"
+                                            data-total="${purchase.total}">
+                                        اختيار
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        purchasesTable.append(row);
+                    });
+                    
+                    // Handle purchase selection
+                    $('.select-record').click(function() {
+                        const id = $(this).data('id');
+                        const oilType = $(this).data('oil-type');
+                        const quantity = $(this).data('quantity');
+                        const price = $(this).data('price');
+                        const total = $(this).data('total');
+                        
+                        $('#record_id').val(id);
+                        $('#oil_type_display').val(oilType);
+                        $('#quantity_display').val(quantity);
+                        $('#price_display').val(price);
+                        $('#total_display').val(total);
+                        
+                        $('#transactionDetailsSection').show();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading purchases data:', error);
+                    $('#recordSelectionArea').append(`
+                        <div class="alert alert-danger mt-3">
+                            خطأ في تحميل بيانات المشتريات: ${error}
+                            <button type="button" class="btn btn-sm btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                    setTimeout(() => {
+                        $('.alert-danger').fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                }
+            });
+        }
+        
+        // Initialize form based on existing data if editing
+        {% if object %}
+            // Set initial values for payment method
+            if ($('#id_payment_method').val() === 'other') {
+                $('#otherPaymentMethodRow').show();
+            }
+            
+            // Show transaction details if available
+            {% if object.oil_type %}
+                $('#oil_type_display').val('{{ object.oil_type.name }}').prop('readonly', true);
+                $('#quantity_display').val('{{ object.quantity }}').prop('readonly', true);
+                $('#price_display').val('{{ object.price }}').prop('readonly', true);
+                $('#total_display').val('{{ object.total }}').prop('readonly', true);
+                $('#transactionDetailsSection').show();
+            {% endif %}
+        {% endif %}
+        
+        // Auto-hide success messages after 5 seconds
+        setTimeout(function() {
+            $('.alert-success').fadeOut(500);
+        }, 5000);
+        
+        // Trigger source change on page load to initialize the form
+        $('#id_source').trigger('change');
+    });
+</script>
+{% endblock %}
+
+$(document).ready(function() {
+    // Auto-hide success messages after 5 seconds
+    setTimeout(function() {
+        $('.alert-success').fadeOut(500);
+    }, 5000);
+});
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

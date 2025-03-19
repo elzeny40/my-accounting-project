@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">{% if object %}تعديل بيانات السائق - {{ object.name }}{% else %}إضافة سائق جديد{% endif %}</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_name" class="form-label">إسم السائق</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_id_number" class="form-label">رقم البطاقة</label>
+                        {{ form.id_number }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_address" class="form-label">العنوان</label>
+                    {{ form.address }}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_phone_number" class="form-label">رقم التليفون</label>
+                        {{ form.phone_number }}
+                        <small class="text-muted">يجب أن يكون رقم مصري (مثال: 01012345678)</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_license_number" class="form-label">رقم الرخصة</label>
+                        {{ form.license_number }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_license_type" class="form-label">نوع الرخصة</label>
+                        {{ form.license_type }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_license_expiry_date" class="form-label">تاريخ انتهاء الرخصة</label>
+                        {{ form.license_expiry_date }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_vehicle_number" class="form-label">رقم السيارة</label>
+                        {{ form.vehicle_number }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_vehicle_type" class="form-label">نوع السيارة</label>
+                        {{ form.vehicle_type }}
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <a href="{% url 'driver_list' %}" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add Bootstrap form classes to all form fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const formControls = document.querySelectorAll('input, select, textarea');
+        formControls.forEach(function(element) {
+            element.classList.add('form-control');
+        });
+        
+        // Make date inputs use date picker
+        const dateInputs = document.querySelectorAll('input[name="license_expiry_date"]');
+        dateInputs.forEach(function(element) {
+            element.type = 'date';
+        });
+    });
+</script>
+{% endblock %}

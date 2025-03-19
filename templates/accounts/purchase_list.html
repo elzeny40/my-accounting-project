@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>قائمة عمليات الشراء</h2>
+
+<div class="mb-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="بحث في كل الحقول...">
+</div>
+
+<a href="{% url 'purchase_create' %}" class="btn btn-success mb-3">إضافة عملية شراء جديدة</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>رقم العملية</th>
+                <th>التاريخ</th>
+                <th>العميل</th>
+                <th>نوع الزيت</th>
+                <th>الكمية (طن)</th>
+                <th>السعر</th>
+                <th>الإجمالي</th>
+                <th>السائق</th>
+                <th>الخزينة</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in purchases %}
+            <tr>
+                <td>{{ purchase.BU_ID }}</td>
+                <td>{{ purchase.date|date:'Y-m-d' }}</td>
+                <td>{{ purchase.supplier.name }}</td>
+                <td>{{ purchase.oil_type.name }}</td>
+                <td>{{ purchase.quantity|floatformat:3 }}</td>
+                <td>{{ purchase.price|floatformat:3 }}</td>
+                <td>{{ purchase.amount|floatformat:3 }}</td>
+                <td>{{ purchase.driver.name }}</td>
+                <td>{{ purchase.treasury.movement_id|default:'-' }}</td>
+                <td>
+                    <a href="{% url 'purchase_update' purchase.pk %}" class="btn btn-sm btn-primary">تعديل</a>
+                    <a href="{% url 'purchase_delete' purchase.pk %}" class="btn btn-sm btn-danger">حذف</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="text-center">لا توجد عمليات شراء مسجلة</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#searchInput').on('keyup', function() {
+        const value = $(this).val().toLowerCase();
+        $('tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% load static %}
+<html dir="rtl">
+<head>
+    <title>روابط النظام</title>
+</head>
+<body>
+    <h1>روابط برنامج كيان الرئيسية</h1>
+    
+    <h2>واجهة الإدارة</h2>
+    <ul>
+        <li><a href="/admin/">لوحة الإدارة (دجانجو)</a></li>
+    </ul>
+
+    <h2>إدارة العملاء</h2>
+    <ul>
+        <li><a href="{% url 'client_list' %}">قائمة العملاء</a></li>
+        <li><a href="{% url 'client_create' %}">إضافة عميل جديد</a></li>
+        <li><a href="{% url 'client_statement' %}">كشف حساب العميل</a></li>
+    </ul>
+
+    <h2>إدارة السائقين</h2>
+    <ul>
+        <li><a href="{% url 'driver_list' %}">قائمة السائقين</a></li>
+        <li><a href="{% url 'driver_create' %}">إضافة سائق جديد</a></li>
+    </ul>
+
+
+    <h2>إدارة المشتريات</h2>
+    <ul>
+        <li><a href="{% url 'purchase_list' %}">قائمة المشتريات</a></li>
+        <li><a href="{% url 'purchase_create' %}">إضافة عملية شراء جديدة</a></li>
+    </ul>
+
+    <h2>إدارة المبيعات</h2>
+    <ul>
+        <li><a href="{% url 'sale_list' %}">قائمة المبيعات</a></li>
+        <li><a href="{% url 'sale_create' %}">إضافة عملية بيع جديدة</a></li>
+    </ul>
+
+    <h2>إدارة المستخدمين</h2>
+    <ul>
+        <li><a href="{% url 'user_list' %}">قائمة المستخدمين</a></li>
+        <li><a href="{% url 'register' %}">إضافة مستخدم جديد</a></li>
+    </ul>
+
+    <h2>إدارة الخزينة</h2>
+    <ul>
+        <li><a href="{% url 'treasury_list' %}">قائمة حركات الخزينة</a></li>
+        <li><a href="{% url 'treasury_create' %}">إضافة حركة خزينة جديدة</a></li>
+    </ul>
+
+    <h2>إدارة حركات السيارات</h2>
+    <ul>
+        <li><a href="{% url 'vehicle_movement_list' %}">قائمة حركات السيارات</a></li>
+        <li><a href="{% url 'vehicle_movement_create_external' %}">إضافة حركة جديدة</a></li>
+    </ul>
+
+    <h2>سجلات الرصيد</h2>
+    <ul>
+        <li><a href="{% url 'client_balance_logs' pk=1 %}">سجلات تعديل الرصيد (مثال)</a></li>
+    </ul>
+
+    <h2>إدارة أنواع الزيوت</h2>
+    <ul>
+        <li><a href="{% url 'oiltype_list' %}">قائمة الأنواع</a></li>
+        <li><a href="{% url 'oiltype_create' %}">إضافة نوع جديد</a></li>
+        <li><a href="{% url 'user_permissions_guide' %}">دليل الصلاحيات</a></li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>أنواع الزيوت</h2>
+
+{% if user.role == 'admin' %}
+<div class="mb-3">
+    <a href="{% url 'oiltype_create' %}" class="btn btn-primary">إضافة نوع جديد</a>
+</div>
+{% endif %}
+
+<div class="mb-3">
+    <form method="get">
+        <input type="text" name="search" placeholder="بحث بالأسم" value="{{ request.GET.search }}">
+        <button type="submit" class="btn btn-sm btn-secondary">بحث</button>
+    </form>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>الرقم</th>
+            <th>اسم الزيت</th>
+            <th>الخصائص</th>
+            <th>ملاحظات</th>
+            <th>الإجراءات</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for oiltype in oiltypes %}
+        {% if oiltype.id %}
+        <tr>
+            <td>{{ oiltype.id }}</td>
+            <td>{{ oiltype.name }}</td>
+            <td>{{ oiltype.properties|truncatechars:30 }}</td>
+            <td>{{ oiltype.notes|truncatechars:30|default:'-' }}</td>
+            <td>
+                {% if user.role == 'admin' %}
+                <a href="{% url 'oiltype_update' pk=oiltype.id %}" class="btn btn-sm btn-primary">تعديل</a>
+                <a href="{% url 'oiltype_delete' pk=oiltype.id %}" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد؟')">حذف</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

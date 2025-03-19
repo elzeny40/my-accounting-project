@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2 class="h4 mb-0">حذف السائق</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead">هل أنت متأكد من حذف السائق "{{ object.name }}" ({{ object.driver_id }})؟</p>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">نعم، احذف</button>
+                    <a href="{% url 'driver_list' %}" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

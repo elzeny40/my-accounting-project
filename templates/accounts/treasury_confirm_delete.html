@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}حذف حركة خزينة{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">تأكيد حذف حركة خزينة</h3>
+        </div>
+        <div class="card-body">
+            <p class="lead">هل أنت متأكد من حذف حركة الخزينة التالية؟</p>
+            
+            <div class="alert alert-warning">
+                <h5>رقم الحركة: {{ object.movement_id }}</h5>
+                <p>
+                    <strong>التاريخ:</strong> {{ object.date|date:"Y-m-d" }}<br>
+                    <strong>نوع الحركة:</strong> 
+                    {% if object.movement_source == 'client_account' %}
+                        من حساب العميل
+                    {% elif object.movement_source == 'company_account' %}
+                        من حساب الشركة
+                    {% elif object.movement_source == 'driver_account' %}
+                        من حساب السائق
+                    {% endif %}<br>
+                    <strong>المبلغ المدفوع:</strong> {{ object.paid_amount|floatformat:2 }} جنيه<br>
+                    <strong>طريقة الدفع:</strong> 
+                    {% if object.payment_method == 'cash' %}
+                        نقدي
+                    {% elif object.payment_method == 'check' %}
+                        شيك
+                    {% elif object.payment_method == 'bank_transfer' %}
+                        تحويل بنكي
+                    {% elif object.payment_method == 'other' %}
+                        {{ object.payment_details }}
+                    {% endif %}<br>
+                    <strong>الوصف:</strong> {{ object.description }}
+                </p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-danger">نعم، حذف</button>
+                    <a href="{% url 'treasury_list' %}" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

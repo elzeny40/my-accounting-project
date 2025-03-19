@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>قائمة السائقين</h2>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if user.role == 'admin' or user.role == 'vehicle_manager' %}
+<div class="mb-3">
+    <a href="{% url 'driver_create' %}" class="btn btn-primary">إضافة سائق جديد</a>
+</div>
+{% endif %}
+
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control" placeholder="بحث..." onkeyup="filterTable()">
+            </div>
+            <div class="col-md-6">
+                <select id="filterSelect" class="form-control" onchange="filterTable()">
+                    <option value="">جميع السائقين</option>
+                    <option value="first">رخصة أولى</option>
+                    <option value="second">رخصة ثانية</option>
+                    <option value="third">رخصة ثالثة</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="driversTable">
+                <thead>
+                    <tr>
+                        <th>رقم السائق</th>
+                        <th>الاسم</th>
+                        <th>رقم البطاقة</th>
+                        <th>رقم الهاتف</th>
+                        <th>رقم الرخصة</th>
+                        <th>نوع الرخصة</th>
+                        <th>تاريخ انتهاء الرخصة</th>
+                        <th>رقم السيارة</th>
+                        <th>نوع السيارة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for driver in drivers %}
+                    <tr data-license-type="{{ driver.license_type }}">
+                        <td>{{ driver.driver_id }}</td>
+                        <td>{{ driver.name }}</td>
+                        <td>{{ driver.id_number }}</td>
+                        <td>{{ driver.phone_number }}</td>
+                        <td>{{ driver.license_number }}</td>
+                        <td>{{ driver.get_license_type_display }}</td>
+                        <td>{{ driver.license_expiry_date }}</td>
+                        <td>{{ driver.vehicle_number }}</td>
+                        <td>{{ driver.vehicle_type }}</td>
+                        <td>
+                            {% if user.role == 'admin' or user.role == 'vehicle_manager' %}
+                            <a href="{% url 'driver_update' driver.id %}" class="btn btn-sm btn-primary">تعديل</a>
+                            <a href="{% url 'driver_delete' driver.id %}" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد؟')">حذف</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterTable() {
+    // Get input values
+    var input = document.getElementById("searchInput");
+    var filter = input.value.toUpperCase();
+    var licenseFilter = document.getElementById("filterSelect").value;
+    
+    // Get table and rows
+    var table = document.getElementById("driversTable");
+    var rows = table.getElementsByTagName("tr");
+    
+    // Loop through all table rows, and hide those who don't match the search query
+    for (var i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+        var row = rows[i];
+        var cells = row.getElementsByTagName("td");
+        var showRow = false;
+        
+        // Check license type filter first
+        if (licenseFilter && row.getAttribute("data-license-type") !== licenseFilter) {
+            row.style.display = "none";
+            continue;
+        }
+        
+        // Check text filter
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            if (cell) {
+                var txtValue = cell.textContent || cell.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    showRow = true;
+                    break;
+                }
+            }
+        }
+        
+        if (showRow || filter === "") {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+.d-none {
+    display: none !important;
+}
+.operation-buttons {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.operation-buttons .btn {
+    margin: 0 10px;
+    min-width: 150px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-truck-moving me-2"></i>
+                {% if form.instance.pk %}
+                تعديل حركة سيارة
+                {% else %}
+                إضافة حركة سيارة {{ movement_type_display }}
+                {% endif %}
+            </h5>
+        </div>
+        
+        <div class="card-body">
+            {% if not form.instance.pk and movement_type == 'internal' %}
+            <div class="operation-buttons">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary" onclick="vehicleMovement.loadOperations('sale')">
+                        <i class="fas fa-shopping-cart me-2"></i>مبيعات
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="vehicleMovement.loadOperations('purchase')">
+                        <i class="fas fa-truck-loading me-2"></i>مشتريات
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="post" id="vehicleMovementForm">
+                {% csrf_token %}
+                <input type="hidden" name="operation_type" id="id_operation_type">
+                <input type="hidden" name="operation_id" id="id_operation_id">
+                
+                <!-- نوع الحركة -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="id_movement_type">نوع الحركة</label>
+                            {{ form.movement_type }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- البيانات الأساسية -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_date">التاريخ</label>
+                            {{ form.date }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_client">العميل</label>
+                            {{ form.client }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_oil_type">نوع الزيت</label>
+                            {{ form.oil_type }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- معلومات السيارة والسائق -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_quantity">الكمية</label>
+                            {{ form.quantity }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_driver">السائق</label>
+                            {{ form.driver }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_vehicle_number">رقم السيارة</label>
+                            {{ form.vehicle_number }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- مواقع التحميل والتفريغ -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_loading_location">مكان التحميل</label>
+                            {{ form.loading_location }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_unloading_location">مكان التفريغ</label>
+                            {{ form.unloading_location }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- النولون -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_driver_freight">نولون السائق</label>
+                            {{ form.driver_freight }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_client_freight">نولون العميل</label>
+                            {{ form.client_freight }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار التحكم -->
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>
+                            حفظ
+                        </button>
+                        <a href="{% url 'vehicle_movement_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>
+                            إلغاء
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for operations -->
+<div class="modal fade" id="operationsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search and filters -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="operationsSearch" placeholder="بحث...">
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="oilTypeFilter">
+                            <option value="">كل أنواع الزيوت</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="locationFilter">
+                            <option value="">كل المواقع</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Operations table will be inserted here -->
+                <div id="operationsTableContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/vehicle_movement.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the vehicle movement handler
+    vehicleMovement.init();
+});
+</script>
+{% endblock %}

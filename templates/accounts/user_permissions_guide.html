@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">دليل إدارة صلاحيات المستخدمين في نظام كيان</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0">نظرة عامة على الأدوار والصلاحيات</h3>
+        </div>
+        <div class="card-body">
+            <p>يعتمد نظام كيان على نموذج متعدد للأدوار يتكون من الأدوار التالية:</p>
+            <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item">
+                    <strong>مدير (Administrator):</strong> يمتلك جميع الصلاحيات في النظام بما في ذلك إدارة المستخدمين وتعديل صلاحياتهم.
+                </li>
+                <li class="list-group-item">
+                    <strong>مستخدم عادي (Regular User):</strong> يمتلك صلاحيات محدودة للاطلاع على البيانات دون القدرة على إجراء تغييرات إدارية.
+                </li>
+                <li class="list-group-item">
+                    <strong>مدير العملاء (Client Manager):</strong> يمتلك صلاحيات إدارة العملاء بما في ذلك إضافة وتعديل وحذف بيانات العملاء.
+                </li>
+                <li class="list-group-item">
+                    <strong>مدير المركبات (Vehicle Manager):</strong> يمتلك صلاحيات إدارة المركبات بما في ذلك إضافة وتعديل وحذف بيانات المركبات.
+                </li>
+                <li class="list-group-item">
+                    <strong>مدير المعاملات (Transaction Manager):</strong> يمتلك صلاحيات إدارة المعاملات المالية بما في ذلك إضافة وتعديل وحذف المعاملات.
+                </li>
+                <li class="list-group-item">
+                    <strong>مشاهد التقارير (Reports Viewer):</strong> يمتلك صلاحيات الاطلاع على التقارير المختلفة في النظام.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0">كيفية إدارة المستخدمين</h3>
+        </div>
+        <div class="card-body">
+            <h4 class="h6 mb-3">إضافة مستخدم جديد</h4>
+            <ol>
+                <li>انتقل إلى صفحة <a href="{% url 'register' %}">تسجيل مستخدم جديد</a>.</li>
+                <li>أدخل اسم المستخدم وكلمة المرور.</li>
+                <li>حدد الدور المناسب للمستخدم (مدير أو مستخدم عادي).</li>
+                <li>انقر على زر "تسجيل" لإنشاء المستخدم.</li>
+            </ol>
+
+            <h4 class="h6 mb-3 mt-4">تعديل صلاحيات المستخدم</h4>
+            <ol>
+                <li>انتقل إلى <a href="{% url 'user_list' %}">قائمة المستخدمين</a>.</li>
+                <li>ابحث عن المستخدم الذي ترغب في تعديل صلاحياته.</li>
+                <li>انقر على زر "تعديل" المقابل لاسم المستخدم.</li>
+                <li>في صفحة التعديل، قم بتغيير الدور من القائمة المنسدلة.</li>
+                <li>انقر على زر "حفظ التغييرات" لتطبيق التعديلات.</li>
+            </ol>
+
+            <div class="alert alert-info mt-3">
+                <strong>ملاحظة هامة:</strong> فقط المستخدمون ذوو دور "مدير" يمكنهم الوصول إلى صفحة إدارة المستخدمين وتعديل الصلاحيات.
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0">صلاحيات المستخدمين حسب الدور</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>الوظيفة</th>
+                        <th>مدير (Administrator)</th>
+                        <th>مستخدم عادي (Regular User)</th>
+                        <th>مدير العملاء (Client Manager)</th>
+                        <th>مدير المركبات (Vehicle Manager)</th>
+                        <th>مدير المعاملات (Transaction Manager)</th>
+                        <th>مشاهد التقارير (Reports Viewer)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>عرض قائمة العملاء</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                    </tr>
+                    <tr>
+                        <td>إضافة/تعديل/حذف العملاء</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                    </tr>
+                    <tr>
+                        <td>عرض قائمة المركبات</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                    </tr>
+                    <tr>
+                        <td>إضافة/تعديل/حذف المركبات</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                    </tr>
+                    <tr>
+                        <td>إدارة المعاملات</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                    </tr>
+                    <tr>
+                        <td>عرض التقارير</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                    </tr>
+                    <tr>
+                        <td>إدارة المستخدمين</td>
+                        <td class="text-center"><i class="bi bi-check-circle text-success"></i> نعم</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                        <td class="text-center"><i class="bi bi-x-circle text-danger"></i> لا</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0">أسئلة شائعة</h3>
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                            كيف يمكنني تغيير دور مستخدم من عادي إلى مدير؟
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            يمكنك تغيير دور المستخدم من خلال الذهاب إلى قائمة المستخدمين، ثم النقر على زر "تعديل" للمستخدم المطلوب، ثم تغيير الدور من القائمة المنسدلة إلى "مدير" ثم حفظ التغييرات.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                            ما هي الأدوار المخصصة المتاحة في النظام؟
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            يوفر النظام الآن عدة أدوار مخصصة بصلاحيات محددة وهي: مدير العملاء (يمكنه إدارة بيانات العملاء)، مدير المركبات (يمكنه إدارة بيانات المركبات)، مدير المعاملات (يمكنه إدارة المعاملات المالية)، ومشاهد التقارير (يمكنه الاطلاع على التقارير). يمكن للمدير تعيين هذه الأدوار للمستخدمين حسب مسؤولياتهم في النظام.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                            ماذا يحدث إذا قمت بحذف مستخدم؟
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            عند حذف مستخدم، سيتم إزالة حسابه بشكل نهائي من النظام ولن يتمكن من تسجيل الدخول مرة أخرى. يرجى التأكد من نقل أي بيانات مهمة مرتبطة بهذا المستخدم قبل حذفه.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

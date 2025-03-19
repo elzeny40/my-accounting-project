@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>كشف حساب العميل</h2>
+
+<div class="mb-3">
+    <a href="{% url 'client_list' %}" class="btn btn-secondary">العودة لقائمة العملاء</a>
+</div>
+
+<!-- Client Selection Form -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">اختيار العميل</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="client_id" class="form-label">العميل</label>
+                <select name="client_id" id="client_id" class="form-select" required>
+                    <option value="">-- اختر العميل --</option>
+                    {% for client_item in clients %}
+                        <option value="{{ client_item.id }}" {% if client and client.id == client_item.id %}selected{% endif %}>{{ client_item.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">عرض كشف الحساب</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if client %}
+<!-- Client Information -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">بيانات العميل</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <p><strong>رقم العميل:</strong> {{ client.client_id }}</p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>اسم العميل:</strong> {{ client.name }}</p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>رقم الهاتف:</strong> {{ client.phone_number }}</p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>الرصيد الحالي:</strong> <span class="{% if client.balance >= 0 %}text-success{% else %}text-danger{% endif %}">{{ client.balance }}</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions Summary -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">إجمالي المبيعات</h5>
+                <h3 class="card-text">{{ total_sales|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">إجمالي المشتريات</h5>
+                <h3 class="card-text">{{ total_purchases|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">إجمالي حركات الخزينة</h5>
+                <h3 class="card-text">{{ total_treasury|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Transactions Table -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">جميع المعاملات</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>رقم العملية</th>
+                        <th>نوع العملية</th>
+                        <th>التفاصيل</th>
+                        <th>المبلغ</th>
+                        <th>الرصيد</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.date|date:'Y-m-d' }}</td>
+                        <td>{{ transaction.transaction_id }}</td>
+                        <td>
+                            <span class="badge {% if transaction.type == 'sale' %}bg-success{% elif transaction.type == 'purchase' %}bg-primary{% else %}bg-info{% endif %}">
+                                {% if transaction.type == 'sale' %}مبيعات{% elif transaction.type == 'purchase' %}مشتريات{% else %}خزينة{% endif %}
+                            </span>
+                        </td>
+                        <td>{{ transaction.details }}</td>
+                        <td class="{% if transaction.amount > 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ transaction.amount|floatformat:2 }}
+                        </td>
+                        <td>{{ transaction.balance|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">لا توجد معاملات لهذا العميل</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

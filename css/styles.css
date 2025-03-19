@@ -1,0 +1,74 @@
+/* General Styles */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
+/* Form Elements */
+.form-control.readonly-field {
+    background-color: #e9ecef;
+}
+
+.select2-container--bootstrap4 .select2-selection {
+    border-color: #ced4da;
+}
+
+.select2-container--bootstrap4.select2-container--focus .select2-selection {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Buttons */
+.btn-primary:disabled {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    cursor: not-allowed;
+}
+
+/* Tables */
+.table-responsive {
+    margin-bottom: 1rem;
+}
+
+.table th {
+    background-color: var(--light-color);
+}
+
+/* RTL Support */
+[dir="rtl"] .modal-header .btn-close {
+    margin: calc(-.5 * var(--bs-modal-header-padding-y)) auto calc(-.5 * var(--bs-modal-header-padding-y)) calc(-.5 * var(--bs-modal-header-padding-x));
+}
+
+/* Modal Styles */
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* Search inputs */
+.input-group .input-group-text {
+    background-color: var(--light-color);
+}
+
+/* Custom styles for vehicle movement form */
+#operation-fields {
+    transition: display 0.3s ease;
+    padding: 1rem 0;
+}
+
+#showOperationsBtn {
+    transition: opacity 0.3s ease;
+}
+
+#showOperationsBtn:disabled {
+    opacity: 0.65;
+}

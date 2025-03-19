@@ -1,0 +1,141 @@
+/* تنسيق أعمدة الجداول لضمان عرض مناسب للمحتوى */
+
+/* تنسيق عام للجداول */
+.table {
+    width: 100%;
+    table-layout: auto;
+    margin-bottom: 1rem;
+}
+
+/* تنسيق خاص بجدول حركات السيارات */
+#movementsTable th,
+#movementsTable td {
+    white-space: nowrap;
+    padding: 0.5rem;
+    vertical-align: middle;
+}
+
+/* تحديد عرض الأعمدة بناءً على محتواها */
+#movementsTable th:nth-child(1),
+#movementsTable td:nth-child(1) {
+    /* رقم الحركة */
+    min-width: 80px;
+    max-width: 100px;
+}
+
+#movementsTable th:nth-child(2),
+#movementsTable td:nth-child(2) {
+    /* التاريخ */
+    min-width: 100px;
+    max-width: 120px;
+}
+
+#movementsTable th:nth-child(3),
+#movementsTable td:nth-child(3) {
+    /* نوع الحركة */
+    min-width: 80px;
+    max-width: 100px;
+}
+
+#movementsTable th:nth-child(4),
+#movementsTable td:nth-child(4) {
+    /* رقم العملية */
+    min-width: 80px;
+    max-width: 100px;
+}
+
+#movementsTable th:nth-child(5),
+#movementsTable td:nth-child(5) {
+    /* العميل */
+    min-width: 120px;
+    max-width: 180px;
+}
+
+#movementsTable th:nth-child(6),
+#movementsTable td:nth-child(6) {
+    /* السائق */
+    min-width: 120px;
+    max-width: 180px;
+}
+
+#movementsTable th:nth-child(7),
+#movementsTable td:nth-child(7) {
+    /* رقم السيارة */
+    min-width: 100px;
+    max-width: 120px;
+}
+
+#movementsTable th:nth-child(8),
+#movementsTable td:nth-child(8) {
+    /* نوع الزيت */
+    min-width: 80px;
+    max-width: 120px;
+}
+
+#movementsTable th:nth-child(9),
+#movementsTable td:nth-child(9) {
+    /* الكمية */
+    min-width: 80px;
+    max-width: 100px;
+    text-align: left;
+}
+
+#movementsTable th:nth-child(10),
+#movementsTable td:nth-child(10) {
+    /* مكان التحميل */
+    min-width: 100px;
+    max-width: 150px;
+}
+
+#movementsTable th:nth-child(11),
+#movementsTable td:nth-child(11) {
+    /* مكان التفريغ */
+    min-width: 100px;
+    max-width: 150px;
+}
+
+#movementsTable th:nth-child(12),
+#movementsTable td:nth-child(12) {
+    /* النولون للسائق */
+    min-width: 100px;
+    max-width: 120px;
+    text-align: left;
+}
+
+#movementsTable th:nth-child(13),
+#movementsTable td:nth-child(13) {
+    /* النولون للعميل */
+    min-width: 100px;
+    max-width: 120px;
+    text-align: left;
+}
+
+#movementsTable th:nth-child(14),
+#movementsTable td:nth-child(14) {
+    /* الإجراءات */
+    min-width: 120px;
+    max-width: 120px;
+    text-align: center;
+}
+
+/* تنسيق عام لجميع الجداول في التطبيق */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* تنسيق خاص بالجداول في الصفحات الأخرى */
+.table th {
+    font-weight: bold;
+}
+
+/* تحسين عرض الجداول على الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    #movementsTable th,
+    #movementsTable td {
+        padding: 0.3rem;
+    }
+}

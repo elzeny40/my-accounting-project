@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{% if object %}تعديل نوع الزيت{% else %}إضافة نوع زيت جديد{% endif %}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label>اسم الزيت:</label>
+        {{ form.name }}
+    </div>
+    <div class="form-group">
+        <label>الخصائص:</label>
+        {{ form.properties }}
+    </div>
+    <div class="form-group">
+        <label>ملاحظات:</label>
+        {{ form.notes }}
+    </div>
+    <button type="submit" class="btn btn-primary">حفظ</button>
+    <a href="{% url 'oiltype_list' %}" class="btn btn-secondary">إلغاء</a>
+</form>
+{% endblock %}

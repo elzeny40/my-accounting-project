@@ -1,0 +1,163 @@
+<!-- Modal -->
+<div class="modal fade" id="operationsModal" tabindex="-1" aria-labelledby="operationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="operationsModalLabel">اختيار عملية</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search and filter controls -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="operationSearch" placeholder="بحث...">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="oilTypeFilter">
+                            <option value="">كل أنواع الزيوت</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="locationFilter">
+                            <option value="">كل المواقع</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="operationsTable">
+                        <thead>
+                            <tr>
+                                <th>رقم العملية</th>
+                                <th>التاريخ</th>
+                                <th>العميل</th>
+                                <th>نوع الزيت</th>
+                                <th>الكمية</th>
+                                <th>مكان التحميل</th>
+                                <th>مكان التفريغ</th>
+                                <th>السائق</th>
+                                <th>اختيار</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for operation in operations %}
+                            <tr>
+                                <td>{{ operation.id }}</td>
+                                <td data-sort="{{ operation.date }}">{{ operation.date }}</td>
+                                <td>{{ operation.client_name }}</td>
+                                <td>{{ operation.oil_type_name }}</td>
+                                <td data-sort="{{ operation.quantity }}">{{ operation.quantity|floatformat:3 }}</td>
+                                <td>{{ operation.loading_location }}</td>
+                                <td>{{ operation.unloading_location }}</td>
+                                <td>{{ operation.driver_name }}</td>
+                                <td>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-primary select-operation" 
+                                            data-operation='{{ operation|json_script:"operation-"|add:operation.id }}'
+                                            onclick="handleOperationSelect(this)">
+                                        <i class="fas fa-check"></i>
+                                        اختيار
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center">لا توجد عمليات</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = $('#operationsTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Arabic.json'
+        },
+        order: [[1, 'desc']], // Sort by date descending
+        pageLength: 10,
+        dom: 'rtip',
+        columnDefs: [{
+            targets: -1,
+            orderable: false
+        }]
+    });
+
+    // Setup filters
+    const setupFilters = () => {
+        const oilTypes = new Set();
+        const locations = new Set();
+        
+        table.rows().every(function() {
+            const data = this.data();
+            oilTypes.add(data[3]); // Oil type column
+            locations.add(data[5]); // Loading location
+            locations.add(data[6]); // Unloading location
+        });
+
+        const oilTypeFilter = $('#oilTypeFilter');
+        const locationFilter = $('#locationFilter');
+
+        [...oilTypes].sort().forEach(type => {
+            if (type) oilTypeFilter.append($('<option>').val(type).text(type));
+        });
+
+        [...locations].sort().forEach(location => {
+            if (location) locationFilter.append($('<option>').val(location).text(location));
+        });
+    };
+
+    setupFilters();
+
+    // Search functionality
+    $('#operationSearch').on('keyup', function() {
+        table.search(this.value).draw();
+    });
+
+    // Filter handling
+    const filterTable = () => {
+        const oilType = $('#oilTypeFilter').val();
+        const location = $('#locationFilter').val();
+
+        $.fn.dataTable.ext.search.push(function(settings, data) {
+            if (oilType && data[3] !== oilType) return false;
+            if (location && data[5] !== location && data[6] !== location) return false;
+            return true;
+        });
+
+        table.draw();
+        $.fn.dataTable.ext.search.pop(); // Remove the filter after drawing
+    };
+
+    $('#oilTypeFilter, #locationFilter').on('change', filterTable);
+
+    // Handle operation selection
+    window.handleOperationSelect = function(button) {
+        const operationData = JSON.parse(button.getAttribute('data-operation'));
+        if (typeof selectOperation === 'function') {
+            selectOperation(operationData.id, operationData);
+        }
+        $('#operationsModal').modal('hide');
+    };
+
+    // Cleanup on modal hide
+    const modal = document.getElementById('operationsModal');
+    if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+            table.destroy();
+            modal.remove();
+        });
+    }
+});
+</script>

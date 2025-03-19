@@ -1,0 +1,53 @@
+<!-- Modal -->
+<div class="modal fade" id="salesModal" tabindex="-1" aria-labelledby="salesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesModalLabel">عمليات البيع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Search and filters -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="salesSearch" placeholder="بحث...">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="salesOilTypeFilter">
+                            <option value="">كل أنواع الزيوت</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="salesLocationFilter">
+                            <option value="">كل المواقع</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Sales table -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>رقم العملية</th>
+                                <th>التاريخ</th>
+                                <th>العميل</th>
+                                <th>نوع الزيت</th>
+                                <th>الكمية</th>
+                                <th>مكان التحميل</th>
+                                <th>مكان التفريغ</th>
+                                <th>السائق</th>
+                                <th>اختيار</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

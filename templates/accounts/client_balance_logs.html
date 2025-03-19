@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Balance Change History for {{ client.name }}</h2>
+
+<div class="mb-3">
+    <a href="{% url 'client_list' %}" class="btn btn-secondary">Back to Client List</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Client Information</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>ID:</strong> {{ client.client_id }}</p>
+        <p><strong>Name:</strong> {{ client.name }}</p>
+        {% if client.company_name %}<p><strong>Company:</strong> {{ client.company_name }}</p>{% endif %}
+        <p><strong>Current Balance:</strong> {{ client.balance }}</p>
+    </div>
+</div>
+
+<h3>Balance Change History</h3>
+
+{% if balance_logs %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Previous Balance</th>
+            <th>New Balance</th>
+            <th>Change Amount</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in balance_logs %}
+        <tr>
+            <td>{{ log.timestamp }}</td>
+            <td>{{ log.user.username }}</td>
+            <td>{{ log.previous_balance }}</td>
+            <td>{{ log.new_balance }}</td>
+            <td>{{ log.change_amount }}</td>
+            <td>{{ log.notes|default:'-' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">No balance change history found for this client.</div>
+{% endif %}
+
+{% endblock %}

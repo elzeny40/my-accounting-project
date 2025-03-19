@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>عمليات البيع</h2>
+
+<div class="mb-3">
+    <a href="{% url 'sale_create' %}" class="btn btn-primary">إضافة عملية بيع جديدة</a>
+</div>
+
+<div class="mb-3">
+    <form method="get">
+        <input type="text" name="search" placeholder="بحث بأي مدخل" value="{{ request.GET.search }}">
+        <button type="submit" class="btn btn-sm btn-secondary">بحث</button>
+    </form>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>رقم العملية</th>
+            <th>التاريخ</th>
+            <th>العميل</th>
+            <th>نوع الزيت</th>
+            <th>الكمية (طن)</th>
+            <th>الإجمالي</th>
+            <th>السائق</th>
+            <th>رقم السيارة</th>
+            <th>الإجراءات</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sale in sales %}
+        <tr>
+            <td>{{ sale.sale_id }}</td>
+            <td>{{ sale.date|date:'Y-m-d' }}</td>
+            <td>{{ sale.client.name }}</td>
+            <td>{{ sale.oil_type.name }}</td>
+            <td>{{ sale.quantity }}</td>
+            <td>{{ sale.amount }}</td>
+            <td>{{ sale.driver.name }}</td>
+            <td>{{ sale.vehicle_number }}</td>
+            <td>
+                <a href="{% url 'sale_update' sale.id %}" class="btn btn-sm btn-primary">تعديل</a>
+                <a href="{% url 'sale_delete' sale.id %}" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد؟')">حذف</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
