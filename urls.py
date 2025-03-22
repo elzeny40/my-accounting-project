@@ -43,8 +43,8 @@ urlpatterns = [
     # Oil Type URLs
     path('oiltypes/', OilTypeListView.as_view(), name='oiltype_list'),
     path('oiltypes/create/', OilTypeCreateView.as_view(), name='oiltype_create'),
-    path('oiltypes/<int:pk>/edit/', OilTypeUpdateView.as_view(), name='oiltype_update'),
-    path('oiltypes/<int:pk>/delete/', OilTypeDeleteView.as_view(), name='oiltype_delete'),
+    path('oiltypes/<str:pk>/edit/', OilTypeUpdateView.as_view(), name='oiltype_update'),
+    path('oiltypes/<str:pk>/delete/', OilTypeDeleteView.as_view(), name='oiltype_delete'),
     
     # Purchase URLs
     path('purchases/', PurchaseListView.as_view(), name='purchase_list'),
@@ -67,9 +67,23 @@ urlpatterns = [
     path('vehicle-movements/<str:pk>/delete/', VehicleMovementDeleteView.as_view(), name='vehicle_movement_delete'),
     path('vehicle-movements/export/', vehicle_movement_export, name='vehicle_movement_export'),
     
+    # Treasury URLs
+    path('treasury/', views_treasury.TreasuryListView.as_view(), name='treasury_list'),
+    path('treasury/create/', views_treasury.TreasuryCreateView.as_view(), name='treasury_create'),
+    path('treasury/<int:pk>/edit/', views_treasury.TreasuryUpdateView.as_view(), name='treasury_update'),
+    path('treasury/<int:pk>/delete/', views_treasury.TreasuryDeleteView.as_view(), name='treasury_delete'),
+    
     # API URLs
     path('api/operations/<str:operation_type>/list/', views_api.get_operations_list, name='api_operations_list'),
     path('api/operations/<str:operation_type>/<int:operation_id>/', views_api.get_operation_details, name='api_operation_details'),
+    
+    # Treasury API URLs
+    path('api/sales/', views_treasury.get_sales_json, name='api_sales'),
+    path('api/purchases/', views_treasury.get_purchases_json, name='api_purchases'),
+    path('api/clients/', views_treasury.get_clients_json, name='api_clients'),
+    path('api/drivers/', views_treasury.get_drivers_json, name='api_drivers'),
+    path('api/sales/<int:sale_id>/', views_treasury.get_sale_by_id, name='api_sale_detail'),
+    path('api/purchases/<int:purchase_id>/', views_treasury.get_purchase_by_id, name='api_purchase_detail'),
     
     # Vehicle Movement API URLs - Using views_vehicle for driver and freight endpoints
     path('api/drivers/<int:driver_id>/vehicle/', views_vehicle.get_driver_vehicle, name='get_driver_vehicle'),

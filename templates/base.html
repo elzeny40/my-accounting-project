@@ -19,48 +19,87 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/table-columns.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% with request.resolver_match.url_name as url_name %}
+    {% if url_name != 'user_list' and url_name != 'user_update' and url_name != 'user_delete' and url_name != 'register' %}
+    <!-- القائمة الجانبية المتحركة -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        
+        <div class="section-title">الرئيسية</div>
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
+        
+        <div class="section-title">إدارة العملاء</div>
+        <a href="{% url 'client_list' %}"><i class="fas fa-users"></i> قائمة العملاء</a>
+        <a href="{% url 'client_create' %}"><i class="fas fa-user-plus"></i> إضافة عميل جديد</a>
+        <a href="{% url 'client_statement' %}"><i class="fas fa-file-invoice"></i> كشف حساب العميل</a>
+        
+        <div class="section-title">إدارة السائقين</div>
+        <a href="{% url 'driver_list' %}"><i class="fas fa-id-card"></i> قائمة السائقين</a>
+        <a href="{% url 'driver_create' %}"><i class="fas fa-user-plus"></i> إضافة سائق جديد</a>
+        
+        <div class="section-title">إدارة المشتريات</div>
+        <a href="{% url 'purchase_list' %}"><i class="fas fa-shopping-cart"></i> قائمة المشتريات</a>
+        <a href="{% url 'purchase_create' %}"><i class="fas fa-cart-plus"></i> إضافة عملية شراء جديدة</a>
+        
+        <div class="section-title">إدارة المبيعات</div>
+        <a href="{% url 'sale_list' %}"><i class="fas fa-cash-register"></i> قائمة المبيعات</a>
+        <a href="{% url 'sale_create' %}"><i class="fas fa-plus-circle"></i> إضافة عملية بيع جديدة</a>
+        
+        <div class="section-title">إدارة حركات السيارات</div>
+        <a href="{% url 'vehicle_movement_list' %}"><i class="fas fa-truck"></i> قائمة حركات السيارات</a>
+        <a href="{% url 'vehicle_movement_create_external' %}"><i class="fas fa-truck-loading"></i> إضافة حركة جديدة</a>
+        
+        <div class="section-title">إدارة الخزينة</div>
+        <a href="{% url 'treasury_list' %}"><i class="fas fa-money-bill-wave"></i> قائمة حركات الخزينة</a>
+        <a href="{% url 'treasury_create' %}"><i class="fas fa-plus"></i> إضافة حركة خزينة جديدة</a>
+        
+        <div class="section-title">إدارة أنواع الزيوت</div>
+        <a href="{% url 'oiltype_list' %}"><i class="fas fa-oil-can"></i> قائمة الأنواع</a>
+        <a href="{% url 'oiltype_create' %}"><i class="fas fa-plus"></i> إضافة نوع جديد</a>
+        
+        {% if user.role == 'admin' %}
+        <div class="section-title">إدارة المستخدمين</div>
+        <a href="{% url 'user_list' %}"><i class="fas fa-users-cog"></i> قائمة المستخدمين</a>
+        <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</a>
+        {% endif %}
+    </div>
+    
+    <!-- زر فتح القائمة الجانبية -->
+    <button id="sidebarToggle" onclick="openNav()"><i class="fas fa-bars"></i></button>
+    {% endif %}
+    {% endwith %}
+    
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Kayan System</a>
+            <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/KAYAN DARK MODE.png' %}" alt="كيان" height="40"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home' %}">Home</a>
-                        </li>
-                        {% if user.role == 'admin' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'user_list' %}">User Management</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Add User</a>
-                        </li>
-                        {% endif %}
-                    {% endif %}
+                    <!-- تم إزالة روابط الرئيسية وإدارة المستخدمين من هنا ونقلها إلى القائمة الجانبية -->
                 </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="navbar-text me-3">Welcome, {{ user.username }}</span>
+                            <span class="navbar-text me-3">مرحباً، {{ user.username }}</span>
                         </li>
                         <li class="nav-item">
                             <form action="{% url 'logout' %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger">Logout</button>
+                                <button type="submit" class="btn btn-outline-danger">تسجيل الخروج</button>
                             </form>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="btn btn-outline-success me-2" href="{% url 'login' %}">Login</a>
+                            <a class="btn btn-outline-success me-2" href="{% url 'login' %}">تسجيل الدخول</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-primary" href="{% url 'register' %}">Register</a>
+                            <a class="btn btn-primary" href="{% url 'register' %}">تسجيل جديد</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -68,7 +107,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4" id="main">
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -89,7 +128,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="operationsModalLabel">Select Operation</h5>
+                    <h5 class="modal-title" id="operationsModalLabel">اختر العملية</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -97,19 +136,19 @@
                 <div class="modal-body">
                     <div class="row mb-3">
                         <div class="col">
-                            <input type="text" id="operationSearchInput" class="form-control" placeholder="Search operations...">
+                            <input type="text" id="operationSearchInput" class="form-control" placeholder="بحث عن العمليات...">
                         </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Date</th>
-                                    <th>Client</th>
-                                    <th>Driver</th>
-                                    <th>Vehicle</th>
-                                    <th>Action</th>
+                                    <th>الرقم</th>
+                                    <th>التاريخ</th>
+                                    <th>العميل</th>
+                                    <th>السائق</th>
+                                    <th>المركبة</th>
+                                    <th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="operationsTableBody">
@@ -118,7 +157,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">إغلاق</button>
                 </div>
             </div>
         </div>
@@ -158,6 +197,17 @@
                 });
             }
         });
+        
+        // وظائف القائمة الجانبية المتحركة
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("main").style.marginRight = "250px";
+        }
+        
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("main").style.marginRight = "0";
+        }
     </script>
 </body>
 </html>

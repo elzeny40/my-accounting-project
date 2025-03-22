@@ -1,8 +1,150 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}الصفحة الرئيسية - نظام كيان{% endblock %}
 
 {% block content %}
-<div class="mt-5">
-    <h1 class="text-center">Welcome to Kayan System</h1>
-    <p class="text-center lead">Please use the navigation menu to access system features</p>
+<div class="container mt-4">
+    <h1 class="text-center mb-5">مرحباً بك في نظام كيان</h1>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <!-- إدارة العملاء -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">إدارة العملاء</h5>
+                    <p class="card-text">إدارة بيانات العملاء وعرض كشوف الحسابات والأرصدة</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'client_list' %}" class="btn btn-outline-primary">قائمة العملاء</a>
+                        <a href="{% url 'client_create' %}" class="btn btn-outline-success">إضافة عميل</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدارة السائقين -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-id-card fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">إدارة السائقين</h5>
+                    <p class="card-text">إدارة بيانات السائقين وتتبع عملياتهم ومستحقاتهم</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'driver_list' %}" class="btn btn-outline-primary">قائمة السائقين</a>
+                        <a href="{% url 'driver_create' %}" class="btn btn-outline-success">إضافة سائق</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدارة المشتريات -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-shopping-cart fa-3x text-info"></i>
+                    </div>
+                    <h5 class="card-title">إدارة المشتريات</h5>
+                    <p class="card-text">تسجيل وإدارة عمليات شراء الزيوت ومتابعة المخزون</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'purchase_list' %}" class="btn btn-outline-primary">قائمة المشتريات</a>
+                        <a href="{% url 'purchase_create' %}" class="btn btn-outline-success">إضافة مشتريات</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدارة المبيعات -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-cash-register fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">إدارة المبيعات</h5>
+                    <p class="card-text">تسجيل وإدارة عمليات بيع الزيوت ومتابعة الإيرادات</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'sale_list' %}" class="btn btn-outline-primary">قائمة المبيعات</a>
+                        <a href="{% url 'sale_create' %}" class="btn btn-outline-success">إضافة مبيعات</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدارة حركات السيارات -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-truck fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="card-title">إدارة حركات السيارات</h5>
+                    <p class="card-text">تسجيل ومتابعة حركات السيارات وعمليات النقل</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'vehicle_movement_list' %}" class="btn btn-outline-primary">قائمة الحركات</a>
+                        <a href="{% url 'vehicle_movement_create_external' %}" class="btn btn-outline-success">إضافة حركة</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدارة الخزينة -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-money-bill-wave fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">إدارة الخزينة</h5>
+                    <p class="card-text">تسجيل ومتابعة حركات الخزينة والإيرادات والمصروفات</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'treasury_list' %}" class="btn btn-outline-primary">قائمة الحركات</a>
+                        <a href="{% url 'treasury_create' %}" class="btn btn-outline-success">إضافة حركة</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- إدارة أنواع الزيوت -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-oil-can fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">إدارة أنواع الزيوت</h5>
+                    <p class="card-text">إدارة أنواع الزيوت وأسعارها ومتابعة المخزون</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'oiltype_list' %}" class="btn btn-outline-primary">قائمة الأنواع</a>
+                        <a href="{% url 'oiltype_create' %}" class="btn btn-outline-success">إضافة نوع</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if user.role == 'admin' %}
+        <!-- إدارة المستخدمين -->
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-cog fa-3x text-secondary"></i>
+                    </div>
+                    <h5 class="card-title">إدارة المستخدمين</h5>
+                    <p class="card-text">إدارة حسابات المستخدمين وصلاحياتهم في النظام</p>
+                    <div class="d-flex justify-content-around mt-4">
+                        <a href="{% url 'user_list' %}" class="btn btn-outline-primary">قائمة المستخدمين</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-success">إضافة مستخدم</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

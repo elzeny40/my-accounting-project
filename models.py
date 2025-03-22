@@ -196,13 +196,19 @@ class Treasury(models.Model):
     related_sale = models.ForeignKey('Sale', on_delete=models.SET_NULL, null=True, blank=True)
     related_purchase = models.ForeignKey('Purchase', on_delete=models.SET_NULL, related_name='treasury_movements', null=True, blank=True)
     related_driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, related_name='treasury_movements', null=True, blank=True)
+    related_client = models.ForeignKey(Client, on_delete=models.SET_NULL, related_name='treasury_movements', null=True, blank=True)
     oil_type = models.ForeignKey(OilType, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total = models.DecimalField(max_digits=15, decimal_places=2, editable=False, null=True, blank=True)
     
     def __str__(self):
-        return f"{self.movement_id} - {self.client.name}"
+        if self.related_client:
+            return f"{self.movement_id} - {self.related_client.name}"
+        elif self.related_driver:
+            return f"{self.movement_id} - {self.related_driver.name}"
+        else:
+            return f"{self.movement_id}"
 
 class Purchase(models.Model):
     BU_ID = models.CharField(max_length=20, unique=True, editable=False)

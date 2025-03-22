@@ -1,22 +1,83 @@
 {% extends 'base.html' %}
-{% block content %}
-<h2>{% if object %}تعديل نوع الزيت{% else %}إضافة نوع زيت جديد{% endif %}</h2>
+{% load treasury_filters %}
 
-<form method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        <label>اسم الزيت:</label>
-        {{ form.name }}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0 responsive-heading">{% if object %}تعديل نوع الزيت - {{ object.name }}{% else %}إضافة نوع زيت جديد{% endif %}</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="row g-3">
+                {% csrf_token %}
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_name" class="form-label">اسم الزيت</label>
+                    {{ form.name|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_properties" class="form-label">الخصائص</label>
+                    {{ form.properties|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <label for="id_notes" class="form-label">ملاحظات</label>
+                    {{ form.notes|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-12 mt-3 d-flex justify-content-end">
+                    <a href="{% url 'oiltype_list' %}" class="btn btn-secondary ms-2">إلغاء</a>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label>الخصائص:</label>
-        {{ form.properties }}
-    </div>
-    <div class="form-group">
-        <label>ملاحظات:</label>
-        {{ form.notes }}
-    </div>
-    <button type="submit" class="btn btn-primary">حفظ</button>
-    <a href="{% url 'oiltype_list' %}" class="btn btn-secondary">إلغاء</a>
-</form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // إضافة الفئة form-control لجميع حقول النموذج
+    document.addEventListener('DOMContentLoaded', function() {
+        const formControls = document.querySelectorAll('input, textarea, select');
+        formControls.forEach(element => {
+            if (!element.classList.contains('btn')) {
+                element.classList.add('form-control');
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* تنسيق العنوان ليكون بنفس الحجم الموجود في الصورة */
+    .responsive-heading {
+        font-size: 1.75rem;
+        font-weight: bold;
+        line-height: 1.2;
+        margin: 0;
+        padding: 0.5rem 0;
+    }
+    
+    /* تكيف حجم العنوان مع زيادة عدد السطور */
+    @media (max-width: 768px) {
+        .responsive-heading {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* زيادة حجم العنوان عند زيادة المحتوى */
+    .card-header {
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* تعيين ارتفاع جميع حقول الإدخال إلى 38 بيكسل */
+    input.form-control, select.form-control, textarea.form-control {
+        height: 38px !important;
+    }
+</style>
 {% endblock %}

@@ -1,86 +1,136 @@
 {% extends 'base.html' %}
+{% load treasury_filters %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">{% if object %}تعديل بيانات السائق - {{ object.name }}{% else %}إضافة سائق جديد{% endif %}</h2>
-    
-    <div class="card">
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0 responsive-heading">{% if object %}تعديل بيانات السائق - {{ object.name }}{% else %}إضافة سائق جديد{% endif %}</h2>
+        </div>
         <div class="card-body">
-            <form method="POST">
+            <form method="POST" action="{% if object %}{% url 'driver_update' object.pk %}{% else %}{% url 'driver_create' %}{% endif %}" class="row g-3">
                 {% csrf_token %}
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_name" class="form-label">إسم السائق</label>
-                        {{ form.name }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="id_id_number" class="form-label">رقم البطاقة</label>
-                        {{ form.id_number }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_name" class="form-label">إسم السائق</label>
+                    {{ form.name|add_class:"form-control" }}
                 </div>
                 
-                <div class="mb-3">
+                <div class="col-md-6 mb-3">
+                    <label for="id_id_number" class="form-label">رقم البطاقة</label>
+                    {{ form.id_number|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-12 mb-3">
                     <label for="id_address" class="form-label">العنوان</label>
-                    {{ form.address }}
+                    {{ form.address|add_class:"form-control" }}
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_phone_number" class="form-label">رقم التليفون</label>
-                        {{ form.phone_number }}
-                        <small class="text-muted">يجب أن يكون رقم مصري (مثال: 01012345678)</small>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="id_license_number" class="form-label">رقم الرخصة</label>
-                        {{ form.license_number }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_phone_number" class="form-label">رقم التليفون</label>
+                    {{ form.phone_number|add_class:"form-control" }}
+                    <small class="text-muted">يجب أن يكون رقم مصري (مثال: 01012345678)</small>
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_license_type" class="form-label">نوع الرخصة</label>
-                        {{ form.license_type }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="id_license_expiry_date" class="form-label">تاريخ انتهاء الرخصة</label>
-                        {{ form.license_expiry_date }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_license_number" class="form-label">رقم الرخصة</label>
+                    {{ form.license_number|add_class:"form-control" }}
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="id_vehicle_number" class="form-label">رقم السيارة</label>
-                        {{ form.vehicle_number }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="id_vehicle_type" class="form-label">نوع السيارة</label>
-                        {{ form.vehicle_type }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_license_type" class="form-label">نوع الرخصة</label>
+                    {{ form.license_type|add_class:"form-control" }}
                 </div>
                 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">حفظ</button>
-                    <a href="{% url 'driver_list' %}" class="btn btn-secondary">إلغاء</a>
+                <div class="col-md-6 mb-3">
+                    <label for="id_license_expiry_date" class="form-label">تاريخ انتهاء الرخصة</label>
+                    {{ form.license_expiry_date|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_vehicle_number" class="form-label">رقم السيارة</label>
+                    {{ form.vehicle_number|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_vehicle_type" class="form-label">نوع السيارة</label>
+                    {{ form.vehicle_type|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-12 mt-3 d-flex justify-content-end">
+                    <a href="{% url 'driver_list' %}" class="btn btn-secondary ms-2">إلغاء</a>
+                    <button type="submit" class="btn btn-primary" id="saveButton">حفظ</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* تنسيق العنوان ليكون بنفس الحجم الموجود في الصورة */
+    .responsive-heading {
+        font-size: 1.75rem;
+        font-weight: bold;
+        line-height: 1.2;
+        margin: 0;
+        padding: 0.5rem 0;
+    }
+    
+    /* تكيف حجم العنوان مع زيادة عدد السطور */
+    @media (max-width: 768px) {
+        .responsive-heading {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* زيادة حجم العنوان عند زيادة المحتوى */
+    .card-header {
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* تنسيق حقل العنوان ليكون بنفس ارتفاع باقي المدخلات */
+    #id_address {
+        height: 38px;
+        resize: vertical;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-    // Add Bootstrap form classes to all form fields
+    // إضافة الفئة form-control لجميع حقول النموذج
     document.addEventListener('DOMContentLoaded', function() {
-        const formControls = document.querySelectorAll('input, select, textarea');
-        formControls.forEach(function(element) {
-            element.classList.add('form-control');
+        const formControls = document.querySelectorAll('input, textarea, select');
+        formControls.forEach(element => {
+            if (!element.classList.contains('btn')) {
+                element.classList.add('form-control');
+            }
         });
         
-        // Make date inputs use date picker
+        // جعل حقول التاريخ تستخدم منتقي التاريخ
         const dateInputs = document.querySelectorAll('input[name="license_expiry_date"]');
         dateInputs.forEach(function(element) {
             element.type = 'date';
         });
+        
+        // تأكيد عمل زر الحفظ بشكل صحيح
+        const saveButton = document.getElementById('saveButton');
+        const driverForm = document.querySelector('form');
+        
+        if (saveButton && driverForm) {
+            // إضافة معالج حدث للتأكد من صحة البيانات قبل الإرسال
+            driverForm.addEventListener('submit', function(e) {
+                // يمكن إضافة التحقق من صحة البيانات هنا إذا لزم الأمر
+                console.log('تم إرسال النموذج');
+                // السماح للنموذج بالإرسال بشكل طبيعي
+            });
+        }
     });
 </script>
 {% endblock %}

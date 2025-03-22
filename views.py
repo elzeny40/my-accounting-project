@@ -3,13 +3,14 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, T
 from django.urls import reverse_lazy
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect, render
-from .mixins import AdminRequiredMixin, ClientManagerRequiredMixin, VehicleManagerRequiredMixin
+from .mixins import AdminRequiredMixin, ClientManagerRequiredMixin, VehicleManagerRequiredMixin, RoleRequiredMixin
 from .models import Client, Driver, CustomUser, BalanceChangeLog, OilType, Sale, Purchase, Treasury
 from django.shortcuts import redirect, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.contrib import messages
-from .forms import LoginForm, PurchaseForm
+from .forms import LoginForm, PurchaseForm, DriverForm
+from django.db.models import Sum
 
 def login_view(request):
     if request.method == 'POST':
@@ -35,33 +36,15 @@ def logout_view(request):
         return redirect('login')
     return redirect('home')
 
-class AdminRequiredMixin:
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.role != 'admin':
-            raise PermissionDenied()
-        return super().dispatch(request, *args, **kwargs)
 
-class RoleRequiredMixin:
-    """A mixin that allows specific roles to access a view"""
-    required_roles = ['admin']
+
+class HomeView(TemplateView):
+    template_name = 'home.html'
     
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.role not in self.required_roles:
-            raise PermissionDenied()
+        if not request.user.is_authenticated:
+            return redirect('login')
         return super().dispatch(request, *args, **kwargs)
-
-class ClientManagerRequiredMixin(RoleRequiredMixin):
-    required_roles = ['admin', 'client_manager']
-
-
-
-class HomeView(RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            if self.request.user.role == 'admin':
-                return reverse_lazy('user_list')
-            return reverse_lazy('client_list')
-        return reverse_lazy('login')
 
 class UserCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = CustomUser
@@ -141,15 +124,25 @@ class DriverListView(LoginRequiredMixin, VehicleManagerRequiredMixin, ListView):
 
 class DriverCreateView(LoginRequiredMixin, VehicleManagerRequiredMixin, CreateView):
     model = Driver
-    fields = ['name', 'id_number', 'address', 'phone_number', 'license_number', 'license_type', 'license_expiry_date', 'vehicle_number', 'vehicle_type']
+    form_class = DriverForm
     template_name = 'accounts/driver_form.html'
     success_url = reverse_lazy('driver_list')
+    
+    def form_valid(self, form):
+        # إضافة معالجة إضافية للنموذج إذا لزم الأمر
+        messages.success(self.request, "تم إضافة السائق بنجاح")
+        return super().form_valid(form)
 
 class DriverUpdateView(LoginRequiredMixin, VehicleManagerRequiredMixin, UpdateView):
     model = Driver
-    fields = ['name', 'id_number', 'address', 'phone_number', 'license_number', 'license_type', 'license_expiry_date', 'vehicle_number', 'vehicle_type']
+    form_class = DriverForm
     template_name = 'accounts/driver_form.html'
     success_url = reverse_lazy('driver_list')
+    
+    def form_valid(self, form):
+        # إضافة معالجة إضافية للنموذج إذا لزم الأمر
+        messages.success(self.request, "تم تحديث بيانات السائق بنجاح")
+        return super().form_valid(form)
 
 class DriverDeleteView(LoginRequiredMixin, VehicleManagerRequiredMixin, DeleteView):
     model = Driver

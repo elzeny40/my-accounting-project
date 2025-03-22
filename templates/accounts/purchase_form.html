@@ -1,8 +1,14 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+
 {% block content %}
-<h2 class="mb-4">{% if object %}تعديل عملية شراء{% else %}تسجيل عملية شراء جديدة{% endif %}</h2>
-<form method="post" class="purchase-form bg-light p-4 rounded shadow-sm">
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0 responsive-heading">{% if object %}تعديل عملية شراء{% else %}تسجيل عملية شراء جديدة{% endif %}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" class="purchase-form row g-3">
     {% csrf_token %}
     {% if form.errors %}
     <div class="alert alert-danger">
@@ -14,69 +20,70 @@
         {% endfor %}
     </div>
     {% endif %}
-    <div class="form-group text-right">
-        {{ form.date.label_tag }}
-        {{ form.date|add_class:"form-control"|attr:"type:date" }}
-    </div>
-    <div class="form-group text-right">
-        <label for="id_supplier">المورد:</label>
-        <select id="id_supplier" name="supplier" class="form-control select2">
-            <option value="">-- اختر المورد --</option>
-            {% for client in clients %}
-                <option value="{{ client.id }}" {% if form.instance.supplier and form.instance.supplier.id == client.id %}selected{% endif %}>{{ client.name }}</option>
-            {% endfor %}
-        </select>
-        <small class="form-text text-muted">اختر المورد (اختياري)</small>
-    </div>
-    <div class="form-group text-right">
-        {{ form.oil_type.label_tag }}
-        {{ form.oil_type|add_class:"form-control" }}
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group text-right">
-                {{ form.quantity.label_tag }}
-                {{ form.quantity|add_class:"form-control"|attr:"step=0.01 min=0" }}
-            </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_date" class="form-label">التاريخ</label>
+                    {{ form.date|add_class:"form-control"|attr:"type:date" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_supplier" class="form-label">المورد</label>
+                    <select id="id_supplier" name="supplier" class="form-control select2">
+                        <option value="">-- اختر المورد --</option>
+                        {% for client in clients %}
+                            <option value="{{ client.id }}" {% if form.instance.supplier and form.instance.supplier.id == client.id %}selected{% endif %}>{{ client.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">اختر المورد (اختياري)</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_oil_type" class="form-label">نوع الزيت</label>
+                    {{ form.oil_type|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_quantity" class="form-label">الكمية</label>
+                    {{ form.quantity|add_class:"form-control"|attr:"step=0.01 min=0" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_price" class="form-label">السعر</label>
+                    {{ form.price|add_class:"form-control"|attr:"step=0.01 min=0" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_total" class="form-label">الإجمالي</label>
+                    <input type="text" id="id_total" name="total" class="form-control bg-light font-weight-bold" value="{{ form.total.value|default:'' }}" readonly>
+                    <small class="form-text text-muted">يتم حساب الإجمالي تلقائياً (الكمية × السعر)</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_loading_location" class="form-label">موقع التحميل</label>
+                    {{ form.loading_location|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="id_unloading_location" class="form-label">موقع التفريغ</label>
+                    {{ form.unloading_location|add_class:"form-control" }}
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <label for="id_driver" class="form-label">السائق</label>
+                    {{ form.driver|add_class:"form-control select2" }}
+                    <div class="mt-2 p-2 border rounded bg-white">
+                        <label><i class="fas fa-truck"></i> رقم السيارة:</label>
+                        <span id="vehicleDisplay" class="font-weight-bold text-primary">{{ form.instance.driver.vehicle_number|default:'لم يتم تحديد سيارة' }}</span>
+                    </div>
+                    <small class="form-text text-muted">سيتم عرض رقم السيارة تلقائياً عند اختيار السائق</small>
+                </div>
+                <div class="col-12 mt-3 d-flex justify-content-end">
+                    <a href="{% url 'purchase_list' %}" class="btn btn-secondary ms-2"><i class="fas fa-times me-1"></i> إلغاء</a>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> حفظ</button>
+                </div>
+            </form>
         </div>
-        <div class="col-md-6">
-            <div class="form-group text-right">
-                {{ form.price.label_tag }}
-                {{ form.price|add_class:"form-control"|attr:"step=0.01 min=0" }}
-            </div>
-        </div>
     </div>
-    <div class="form-group text-right">
-        <label for="id_total">الإجمالي:</label>
-        <input type="text" id="id_total" name="total" class="form-control bg-light font-weight-bold" value="{{ form.total.value|default:'' }}" readonly>
-        <small class="form-text text-muted">يتم حساب الإجمالي تلقائياً (الكمية × السعر)</small>
-    </div>
-    <div class="form-group text-right">
-        {{ form.loading_location.label_tag }}
-        {{ form.loading_location|add_class:"form-control" }}
-    </div>
-    <div class="form-group text-right">
-        {{ form.unloading_location.label_tag }}
-        {{ form.unloading_location|add_class:"form-control" }}
-    </div>
-    <div class="form-group text-right">
-        {{ form.driver.label_tag }}
-        {{ form.driver|add_class:"form-control select2" }}
-        <div class="mt-2 p-2 border rounded bg-white">
-            <label><i class="fas fa-truck"></i> رقم السيارة:</label>
-            <span id="vehicleDisplay" class="font-weight-bold text-primary">{{ form.instance.driver.vehicle_number|default:'لم يتم تحديد سيارة' }}</span>
-        </div>
-        <small class="form-text text-muted">سيتم عرض رقم السيارة تلقائياً عند اختيار السائق</small>
-    </div>
-    <div class="form-group mt-4 d-flex justify-content-between">
-        <div>
-            <a href="{% url 'purchase_list' %}" class="btn btn-secondary"><i class="fas fa-times me-1"></i> إلغاء</a>
-        </div>
-        <div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> حفظ</button>
-        </div>
-    </div>
-</form>
+</div>
 
 <script>
 $(document).ready(function() {
@@ -166,4 +173,127 @@ $(document).ready(function() {
     }
 });
 </script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // إضافة الفئة form-control لجميع حقول النموذج
+    document.addEventListener('DOMContentLoaded', function() {
+        const formControls = document.querySelectorAll('input, textarea, select');
+        formControls.forEach(element => {
+            if (!element.classList.contains('btn')) {
+                element.classList.add('form-control');
+            }
+        });
+    });
+    
+    // حساب الإجمالي تلقائيًا
+    function calculateTotal() {
+        let quantity = parseFloat($('#id_quantity').val()) || 0;
+        let price = parseFloat($('#id_price').val()) || 0;
+        let total = quantity * price;
+        $('#id_total').val(total.toFixed(3));
+        
+        // تغيير لون الإجمالي للتأكيد على التغيير
+        $('#id_total').addClass('bg-success text-white');
+        setTimeout(function() {
+            $('#id_total').removeClass('bg-success text-white');
+        }, 300);
+    }
+    
+    // تفعيل حساب الإجمالي عند تغيير الكمية أو السعر
+    $('#id_quantity, #id_price').on('input', calculateTotal);
+    
+    // حساب الإجمالي عند تحميل الصفحة
+    calculateTotal();
+
+    // تهيئة Select2 للقوائم المنسدلة
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        dir: 'rtl',
+        language: 'ar'
+    });
+
+    // عرض رقم السيارة
+    $('#id_driver').change(function() {
+        $('#vehicleDisplay').text('');
+        let driverId = $(this).val();
+        if (!driverId) {
+            $('#vehicleDisplay').text('لم يتم تحديد سيارة');
+            // Ensure we have an empty vehicle_number field
+            if ($('#id_vehicle_number').length) {
+                $('#id_vehicle_number').val('');
+            } else {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'id_vehicle_number',
+                    name: 'vehicle_number',
+                    value: ''
+                }).appendTo('form');
+            }
+            return;
+        }
+        
+        // عرض مؤشر التحميل
+        $('#vehicleDisplay').html('<i class="fas fa-spinner fa-spin"></i> جاري التحميل...');
+        
+        $.ajax({
+            url: `/accounts/api/drivers/${driverId}/vehicle/`,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: function(data) {
+                let vehicleNumber = data.vehicle_number || '';
+                $('#vehicleDisplay').text(vehicleNumber || 'غير متوفر');
+                // Update the vehicle_number field value
+                if ($('#id_vehicle_number').length) {
+                    // If the field exists, update its value
+                    $('#id_vehicle_number').val(vehicleNumber);
+                } else {
+                    // If the field doesn't exist, create it
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'id_vehicle_number',
+                        name: 'vehicle_number',
+                        value: vehicleNumber
+                    }).appendTo('form');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching vehicle data:', error);
+                $('#vehicleDisplay').text('خطأ في جلب البيانات');
+            }
+        });
+    });
+    
+    // تفعيل عرض رقم السيارة عند تحميل الصفحة إذا كان هناك سائق محدد
+    if ($('#id_driver').val()) {
+        $('#id_driver').trigger('change');
+    }
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* تنسيق العنوان ليكون بنفس الحجم الموجود في الصورة */
+    .responsive-heading {
+        font-size: 1.75rem;
+        font-weight: bold;
+        line-height: 1.2;
+        margin: 0;
+        padding: 0.5rem 0;
+    }
+    
+    /* تكيف حجم العنوان مع زيادة عدد السطور */
+    @media (max-width: 768px) {
+        .responsive-heading {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* زيادة حجم العنوان عند زيادة المحتوى */
+    .card-header {
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+    }
+</style>
 {% endblock %}

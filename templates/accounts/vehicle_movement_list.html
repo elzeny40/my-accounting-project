@@ -1,76 +1,36 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css">
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="h5 mb-0">حركات السيارات</h3>
-                    </div>
-                </div>
-                
-                <div class="card-body">
-                    <!-- أزرار إضافة حركة جديدة -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body text-center p-4">
-                                    <div class="mb-3">
-                                        <i class="fas fa-truck fa-4x text-primary"></i>
-                                    </div>
-                                    <h4 class="card-title mb-3">حركة داخلية</h4>
-                                    <p class="card-text mb-4">تسجيل حركة سيارة مرتبطة بعملية بيع أو شراء موجودة بالفعل في النظام</p>
-                                    <a href="{% url 'vehicle_movement_create_internal' %}" class="btn btn-lg btn-primary w-100">
-                                        <i class="fas fa-plus-circle me-2"></i> إنشاء حركة داخلية
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body text-center p-4">
-                                    <div class="mb-3">
-                                        <i class="fas fa-truck-moving fa-4x text-success"></i>
-                                    </div>
-                                    <h4 class="card-title mb-3">حركة خارجية</h4>
-                                    <p class="card-text mb-4">تسجيل حركة سيارة مستقلة غير مرتبطة بعمليات البيع أو الشراء</p>
-                                    <a href="{% url 'vehicle_movement_create_external' %}" class="btn btn-lg btn-success w-100">
-                                        <i class="fas fa-plus-circle me-2"></i> إنشاء حركة خارجية
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<h2>قائمة حركات السيارات</h2>
 
-                    <!-- البحث والتصدير -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <input type="text" id="searchInput" class="form-control" placeholder="بحث...">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="btn-group float-end" role="group">
-                                <button type="button" class="btn btn-outline-primary" onclick="exportToExcel()">
-                                    <i class="fas fa-file-excel"></i> Excel
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" onclick="exportToPDF()">
-                                    <i class="fas fa-file-pdf"></i> PDF
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" onclick="printTable()">
-                                    <i class="fas fa-print"></i> طباعة
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
 
-                    <!-- جدول الحركات -->
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover" id="movementsTable">
+<div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+        <a href="{% url 'vehicle_movement_create_internal' %}" class="btn btn-primary me-2">إضافة حركة داخلية</a>
+        <a href="{% url 'vehicle_movement_create_external' %}" class="btn btn-success">إضافة حركة خارجية</a>
+    </div>
+    <div class="badge bg-info text-white p-2 fs-6">إجمالي عدد الحركات: {{ movements|length }}</div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="movementsTable" class="table table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>رقم الحركة</th>
@@ -100,140 +60,100 @@
                                     <td>{{ movement.driver.name }}</td>
                                     <td>{{ movement.vehicle_number }}</td>
                                     <td>{{ movement.oil_type.name }}</td>
-                                    <td>{{ movement.quantity }}</td>
+                                    <td>{{ movement.quantity|floatformat:3 }}</td>
                                     <td>{{ movement.loading_location }}</td>
                                     <td>{{ movement.unloading_location }}</td>
-                                    <td>{{ movement.driver_freight }}</td>
-                                    <td>{{ movement.client_freight }}</td>
+                                    <td>{{ movement.driver_freight|floatformat:3 }}</td>
+                                    <td>{{ movement.client_freight|floatformat:3 }}</td>
                                     <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-info" onclick="viewMovement('{{ movement.movement_id }}')">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-primary" onclick="editMovement('{{ movement.movement_id }}')">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteMovement('{{ movement.movement_id }}')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                        <a href="{% url 'vehicle_movement_update' pk=movement.movement_id %}" class="btn btn-sm btn-primary">تعديل</a>
+                                        <a href="{% url 'vehicle_movement_delete' pk=movement.movement_id %}" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد؟')">حذف</a>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="14" class="text-center py-5">
-                                        <i class="fas fa-truck-moving fa-3x text-muted mb-3"></i>
-                                        <h4>لا توجد حركات سيارات</h4>
-                                        <p class="text-muted">قم بإضافة حركة سيارة جديدة للبدء</p>
-                                    </td>
+                                    <td colspan="14" class="text-center">لا توجد حركات سيارات مسجلة</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination -->
-                    {% if is_paginated %}
-                    <nav aria-label="Page navigation" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                            {% endif %}
-
-                            {% for num in page_obj.paginator.page_range %}
-                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                    {% endif %}
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-{% block extra_js %}
-<script src="{% static 'js/shared_functions.js' %}"></script>
-<script>
-    // Initialize DataTable with Arabic language
-    $(document).ready(function() {
-        $('#movementsTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Arabic.json"
-            },
-            "order": [[1, "desc"]],
-            "pageLength": 25
-        });
-    });
-
-    // Export functions
-    function exportToExcel() {
-        window.location.href = "{% url 'vehicle_movement_export' %}?format=excel";
-    }
-
-    function exportToPDF() {
-        window.location.href = "{% url 'vehicle_movement_export' %}?format=pdf";
-    }
-
-    function printTable() {
-        window.print();
-    }
-
-    // CRUD operations
-    function viewMovement(id) {
-        window.location.href = `/accounts/vehicle-movements/${id}/`;
-    }
-    
-    function editMovement(id) {
-        window.location.href = `/accounts/vehicle-movements/${id}/edit/`;
-    }
-    
-    function deleteMovement(id) {
-        Swal.fire({
-            title: 'هل أنت متأكد؟',
-            text: 'سيتم حذف هذه الحركة نهائياً',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'نعم، احذف',
-            cancelButtonText: 'إلغاء'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/accounts/vehicle-movements/${id}/delete/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        Swal.fire({
-                            title: 'خطأ',
-                            text: 'حدث خطأ أثناء الحذف',
-                            icon: 'error'
-                        });
-                    }
-                });
-            }
-        });
-    }
-</script>
 {% endblock %}
 
+{% block extra_js %}
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+<script src="{% static 'js/shared_functions.js' %}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // استخدام وظيفة initializeDataTable من ملف shared_functions.js
+        initializeDataTable('#movementsTable', {
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: 'نسخ',
+                    className: 'btn btn-secondary'
+                },
+                {
+                    extend: 'excel',
+                    text: 'إكسل',
+                    className: 'btn btn-success'
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    className: 'btn btn-danger'
+                },
+                {
+                    extend: 'print',
+                    text: 'طباعة',
+                    className: 'btn btn-info'
+                }
+            ],
+            columnDefs: [
+                // تنسيق عمود الكمية والنولون كأرقام
+                {
+                    targets: [8, 11, 12],
+                    render: function(data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            return formatNumber(data, 3);
+                        }
+                        return data;
+                    }
+                },
+                // تعطيل الفرز والبحث في عمود الإجراءات
+                {
+                    targets: 13,
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+            // تفعيل الترقيم التلقائي للصفحات
+            paging: true,
+            // تفعيل البحث المتقدم
+            searching: true,
+            // تفعيل الفرز
+            ordering: true,
+            // عدد العناصر في الصفحة
+            pageLength: 25,
+            // إضافة دعم اللغة العربية
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Arabic.json'
+            }
+        });
+    });
+</script>
 {% endblock %}
